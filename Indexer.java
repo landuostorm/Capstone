@@ -1,3 +1,4 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
@@ -25,7 +26,6 @@ public class Indexer {
 
       //create the indexer
       config = new IndexWriterConfig(Version.LUCENE_43, new StandardAnalyzer(Version.LUCENE_43));
-      
       /*writer = new IndexWriter(indexDirectory, 
          new StandardAnalyzer(Version.LUCENE_36),true,
          IndexWriter.MaxFieldLength.UNLIMITED);*/
@@ -40,10 +40,16 @@ public class Indexer {
    @SuppressWarnings("deprecation")
 private Document getDocument(File file) throws IOException{
       Document document = new Document();
-
+      BufferedReader br = new BufferedReader(new FileReader(file));
+      StringBuilder sb = new StringBuilder();
+      for (String line; (line = br.readLine()) != null;) {
+    	  sb.append(line);
+    	  sb.append('\n');
+      }
       //index file contents
-      Field contentField = new Field(LuceneConstants.CONTENTS, 
-         new FileReader(file));
+      //Field contentField = new Field(LuceneConstants.CONTENTS, 
+         //new FileReader(file));
+      Field contentField = new Field(LuceneConstants.CONTENTS, sb.toString(), Field.Store.YES, Field.Index.ANALYZED);
       //index file name
       Field fileNameField = new Field(LuceneConstants.FILE_NAME,
          file.getName(),
